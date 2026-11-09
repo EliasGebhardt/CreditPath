@@ -84,6 +84,18 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
 .option-card.recommended .deep-analysis-next{margin-top:14px;background:#f9edf4;border-radius:11px;padding:12px 14px;font-size:11px;line-height:1.65;color:#5d4054}
 @media(max-width:780px){.option-card.recommended .deep-analysis-grid{grid-template-columns:1fr}.option-card.recommended{padding:16px}.option-card.recommended .recommend-head{font-size:18px}.options-in-chat.single{margin-left:0;max-width:100%}}
 
+
+/* Guided financing choices, with a narrowly scoped extra-information input */
+.free-text-guide{padding:14px 18px 0;background:#fff;border-top:1px solid #f3ebef}
+.free-text-guide strong{display:block;font-size:12px;color:#363044;margin-bottom:4px}
+.free-text-guide>span{display:block;font-size:11px;color:#77717c;line-height:1.55}
+.context-example-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.context-example-row button{border:1px solid #f2bdd7;background:#fff9fc;color:#b60064;border-radius:999px;padding:8px 11px;font-weight:700;font-size:11px}
+.context-example-row button:hover{background:#ffebf4;border-color:#df82ae}
+.context-warning{padding:9px 18px;background:#fff7ec;border-top:1px solid #efcdb2;color:#82512a;font-size:11px;line-height:1.5}
+.additional-info-link{font-size:11px!important;color:#79717f!important;margin-top:14px!important}
+.option-card.recommended .add-facts-link{font:inherit;border:0;background:none;color:#bd0063;text-decoration:underline;cursor:pointer;padding:0}
+.chat-input.hidden{display:none!important}
 </style>
 </head>
 <body>
@@ -163,7 +175,18 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
 <section id="cashflow" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">ENTRY POINT 2 OF 3</div><h1 class="page-title">Your cashflow forecast</h1><p class="sub">See a potential shortfall ahead of time and explore what might help.</p></div><a href="#simulation" class="button ghost" data-open="simulation">Simulate a project →</a></div><div class="cash-hero"><div class="panel section"><div class="row-split"><div><h2 class="sec-title">Projected closing balance</h2><div class="sec-desc">Illustrative forecast based on demo payments and receivables</div></div><span class="demo-tag">DEMO FORECAST</span></div><svg class="forecast-svg" id="cashflowChart" role="img" aria-label="Projected monthly cashflow"></svg></div><div class="panel gradient-panel"><span class="white-light">Projected November shortfall</span><div class="big">−€14,800</div><p>You may need additional liquidity to bridge your cash needs until invoices are paid. Explore the possible options with CreditPath.</p><a href="#assistant" class="button" style="background:white;color:#8c1b58;border-color:white" data-open="assistant" data-context="forecast">Explore financing →</a></div></div><div class="panel section" style="margin-top:17px"><h2 class="sec-title">Monthly forecast</h2><div class="forecast-row" id="forecastMonths"></div></div><div class="alertline">Forecasts are example estimates, not actual bank predictions. Actual eligibility and pricing require bank checks.</div></section>
 
 <section id="simulation" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">ENTRY POINT 3 OF 3</div><h1 class="page-title">Project cashflow simulator</h1><p class="sub">Explore how a planned investment may change your cash needs.</p></div></div><div class="cols" style="grid-template-columns:1fr 1fr"><div class="panel section"><h2 class="sec-title">New project</h2><p class="sub">Use rough values. These are not real forecasts.</p><form id="scenarioForm" class="form-grid"><div class="field" style="grid-column:1/-1"><label for="projectName">Project name</label><input id="projectName" value="New production line" maxlength="80"></div><div class="field"><label for="investment">Upfront investment (€)</label><input type="number" id="investment" min="0" max="1000000" value="28000" required></div><div class="field"><label for="income">Expected additional receipts (€)</label><input type="number" id="income" min="0" max="1000000" value="15000" required></div><div class="field" style="grid-column:1/-1"><label for="incomeDelay">Expected first customer receipts</label><select id="incomeDelay"><option value="1">Next month</option><option value="2" selected>In two months</option><option value="3">In three months</option><option value="4">In four months</option></select></div><div style="grid-column:1/-1"><button class="button" type="submit">Update forecast →</button></div></form></div><div class="panel section"><h2 class="sec-title">Illustrative project impact</h2><p class="sec-desc">You can change assumptions and compare the new forecast.</p><svg class="forecast-svg" id="simulationChart"></svg><div class="scenario-result" id="scenarioResult"><strong>Potential funding gap: €42,800</strong><p>Including your project investment, the simulated balance could fall further before additional receipts arrive.</p><button class="button mini" id="scenarioAssistant" type="button">Ask CreditPath about this →</button></div></div></div><div class="alertline">Scenario modelling is simplified arithmetic using fake values. It is not lending advice, a bank forecast or a credit decision.</div></section>
-<section id="assistant" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">CREDITPATH · AI FINANCING CONCEPT</div><h1 class="page-title">A clearer path to financing.</h1><p class="sub">Personalised guidance based on your (demo) business context, when you need it.</p></div><div class="toolbar"><button class="button ghost mini" id="resetChat">↻ Start new</button><button class="button ghost mini" id="saveChat">Save conversation</button></div></div><div class="chat-grid"><div class="panel chat-window"><div class="chat-titlebar"><div style="display:flex;gap:11px;align-items:center"><div class="agent-icon">✦</div><div><div class="heading">CreditPath assistant</div><div class="online">● Demo assistant · account context enabled</div></div></div><span class="demo-tag">SIMULATED ANSWERS</span></div><div class="chat-body" id="chatBody" aria-live="polite"><div class="bubble-wrap assistant"><span class="agent-icon" style="width:28px;height:28px;font-size:15px;border-radius:9px">✦</span><div class="bubble">Welcome back, Tiago. Your demo company profile is ready. Use your existing financial data or add details to explore possible financing paths.</div></div><details style="margin:14px 8px;padding:14px;border:1px solid #f5b8d3;border-radius:12px;background:#fff4fa"><summary style="cursor:pointer;font-weight:700;color:#bf0062">Use my existing financial data — preview my recommendation</summary><p style="font-size:13px;line-height:1.6">Example need: €18,000 for a tax payment while awaiting invoices. Initial demo match: Digital Treasury Credit (CDT). Why: the simulated €18,000 tax payment comes before customer receipts, suggesting a short-term liquidity gap. Actual suitability, pricing and approval require bank verification.</p></details><details style="margin:14px 8px;padding:14px;border:1px solid #e7e5ef;border-radius:12px;background:white"><summary style="cursor:pointer;font-weight:700">Add details or ask a question</summary><p style="font-size:13px;line-height:1.6">Enter any additional amount, purpose, deadline or expected incoming cash in the chat field. In a normal browser, the prototype will update the single initial recommendation. Some embedded previews block scripts.</p></details></div><div class="chat-quick" id="quickActions"></div><form id="chatForm" class="chat-input"><input id="chatInput" placeholder="Tell me what you need, or ask a follow-up…" autocomplete="off" maxlength="600" required aria-label="Your message to the demo assistant"><button type="submit" aria-label="Send message">➤</button></form></div><div class="context-stack"><div class="panel context-card"><div class="row-split" style="margin-bottom:15px"><h2 class="sec-title" style="margin:0">Available context</h2><span class="context-indicator">✓ Demo profile</span></div><div class="context-line"><span>Company</span><strong>M&S Têxteis, Lda.</strong></div><div class="context-line"><span>Profile</span><strong>SME · Textiles</strong></div><div class="context-line"><span>Available balance</span><strong>€32,450</strong></div><div class="context-line"><span>60-day receivables</span><strong>€41,800</strong></div><div class="context-line"><span>Next tax payment</span><strong>€18,000</strong></div><div class="context-line"><span>Relationship manager</span><strong>Not assigned</strong></div><div id="newData" style="display:none;margin-top:12px;padding:12px;border-radius:10px;background:#fff0f7;border:1px solid #f5c1da;font-size:11px;line-height:1.6;color:#8b285b"></div><p class="disclaimer">All details are fictional. No external account connections or bank rule databases are used.</p></div><div class="side-help"><h2 class="sec-title">What CreditPath does</h2><p>Understands your need, asks what is missing, suggests one initial financing match and explains why. The real concept would use authorised account data and current bank policies.</p></div><div class="footnote">Student UX prototype · Not Millennium bcp's live interface. No transactions, application submissions, or lending recommendations.</div></div></div></section>
+<section id="assistant" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">CREDITPATH · AI FINANCING CONCEPT</div><h1 class="page-title">A clearer path to financing.</h1><p class="sub">Personalised guidance based on your (demo) business context, when you need it.</p></div><div class="toolbar"><button class="button ghost mini" id="resetChat">↻ Start new</button><button class="button ghost mini" id="saveChat">Save conversation</button></div></div><div class="chat-grid"><div class="panel chat-window"><div class="chat-titlebar"><div style="display:flex;gap:11px;align-items:center"><div class="agent-icon">✦</div><div><div class="heading">CreditPath assistant</div><div class="online">● Guided AI concept · simulated account data</div></div></div><span class="demo-tag">SIMULATED ANSWERS</span></div><div class="chat-body" id="chatBody" aria-live="polite"><div class="bubble-wrap assistant"><span class="agent-icon" style="width:28px;height:28px;font-size:15px;border-radius:9px">✦</span><div class="bubble">Welcome back, Tiago. Your demo company profile is ready. Use your existing financial data or add details to explore possible financing paths.</div></div><details style="margin:14px 8px;padding:14px;border:1px solid #f5b8d3;border-radius:12px;background:#fff4fa"><summary style="cursor:pointer;font-weight:700;color:#bf0062">Use my existing financial data — preview my recommendation</summary><p style="font-size:13px;line-height:1.6">Example need: €18,000 for a tax payment while awaiting invoices. Initial demo match: Digital Treasury Credit (CDT). Why: the simulated €18,000 tax payment comes before customer receipts, suggesting a short-term liquidity gap. Actual suitability, pricing and approval require bank verification.</p></details><details style="margin:14px 8px;padding:14px;border:1px solid #e7e5ef;border-radius:12px;background:white"><summary style="cursor:pointer;font-weight:700">Add details or ask a question</summary><p style="font-size:13px;line-height:1.6">Enter any additional amount, purpose, deadline or expected incoming cash in the chat field. In a normal browser, the prototype will update the single initial recommendation. Some embedded previews block scripts.</p></details></div><div class="chat-quick" id="quickActions"></div>
+<div id="freeTextGuide" class="free-text-guide hidden">
+  <strong>What is missing from your business profile?</strong>
+  <span>Only add information relevant to your financing need. Choose an example to edit, or write a short detail yourself.</span>
+  <div class="context-example-row">
+    <button type="button" data-fill-example="I need to pay an extra €20,000 in 7 days">Extra €20,000 payment</button>
+    <button type="button" data-fill-example="A customer will pay €15,000 next week">€15,000 incoming payment</button>
+    <button type="button" data-fill-example="I am planning equipment for a new project costing €28,000">€28,000 new project</button>
+  </div>
+</div>
+<div id="contextWarning" class="context-warning hidden" role="status" aria-live="polite"></div>
+<form id="chatForm" class="chat-input hidden"><input id="chatInput" placeholder="e.g. I need to pay €20,000 in 7 days" autocomplete="off" maxlength="280" required aria-label="Additional information relevant to your financing need"><button type="submit" aria-label="Add information">➤</button></form></div><div class="context-stack"><div class="panel context-card"><div class="row-split" style="margin-bottom:15px"><h2 class="sec-title" style="margin:0">Available context</h2><span class="context-indicator">✓ Demo profile</span></div><div class="context-line"><span>Company</span><strong>M&S Têxteis, Lda.</strong></div><div class="context-line"><span>Profile</span><strong>SME · Textiles</strong></div><div class="context-line"><span>Available balance</span><strong>€32,450</strong></div><div class="context-line"><span>60-day receivables</span><strong>€41,800</strong></div><div class="context-line"><span>Next tax payment</span><strong>€18,000</strong></div><div class="context-line"><span>Relationship manager</span><strong>Not assigned</strong></div><div id="newData" style="display:none;margin-top:12px;padding:12px;border-radius:10px;background:#fff0f7;border:1px solid #f5c1da;font-size:11px;line-height:1.6;color:#8b285b"></div><p class="disclaimer">All details are fictional. No external account connections or bank rule databases are used.</p></div><div class="side-help"><h2 class="sec-title">What CreditPath does</h2><p>In the proposed AI implementation, CreditPath interprets account data and selected needs, evaluates approved financing rules, and explains one suitable match. This demo simulates those decisions with fictional data — no live AI or bank connection.</p></div><div class="footnote">Student UX prototype · Not Millennium bcp's live interface. No transactions, application submissions, or lending recommendations.</div></div></div></section>
 
 <section id="cards" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">DEMO WORKSPACE</div><h1 class="page-title">Cards</h1><p class="sub">Card-management features are outside this student concept. Use Credit to open the financing menu.</p></div></div><div class="panel section">This is a demonstration interface; no cards or banking credentials are accessed.</div></section>
 <section id="insurance" data-view class="hidden"><div class="head-row"><div><div class="eyebrow">DEMO WORKSPACE</div><h1 class="page-title">Insurance</h1><p class="sub">Insurance features are not included in this student concept.</p></div></div></section>
@@ -244,8 +267,19 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
    state.chat=state.chat.filter(m=>!m.isContextPrompt && !(m.role==='assistant' && typeof m.text==='string' && /^Of course\. Tell me what is missing:/.test(m.text)));
  }
  function act(label,id){return {label,id}}
- const starters=[act('Use my existing financial data','accountSuggest'),act('Add more details first','addContext'),act('What data are you using?','data')];
- function onEnterChat(ctx){if(state.chat.length===0){if(ctx==='add-details'){state.awaitingContext=true;add('assistant',"Hi Tiago! I already have your example company information. What else should I consider? Tell me the amount, the timing, the purpose, or anything I cannot see in the account data.",[act('I need €18,000 for taxes','tax'),act('Use my existing data instead','accountSuggest')]);}else{add('assistant',"Welcome back, Tiago. Your demo business context is already here: €32,450 available balance, €41,800 in expected receivables and an upcoming €18,000 tax bill.\n\nYou can get one initial recommendation based on this information, or tell me more to personalise it. Which would you prefer?",starters)}} else if(ctx==='forecast')add('assistant','Your forecast shows a possible €14,800 liquidity gap next month. Would you like to explore ways to cover a short-term gap, or explain the forecast first?',[act('Explore funding options','forecastQuestion'),act('Explain the forecast','forecastExplain')]);else if(ctx==='simulation'){const v=scenarioValues(),gap=Math.max(0,-Math.min(...v));add('assistant',`I see you're considering “${scenario.name}”. The simulated project requires ${fmt(scenario.cost)} upfront and could create a peak funding gap of ${fmt(gap)}. Would you like to understand possible financing paths?`,[act('Explore project financing','scenarioQuestion'),act('Why the gap?','scenarioWhy')])}renderChat()}
+ const starters=[act('Show my best credit','accountSuggest'),act('Choose a financing need','guidedNeed'),act('Add missing information','addContext'),act('What data are you using?','data')];
+ function onEnterChat(ctx){
+   if(state.chat.length===0){
+     const intro=ctx==='forecast'
+       ? 'Your demo cashflow forecast highlights a possible temporary liquidity gap. I can suggest an initial credit match using your existing account information or help you choose another need.'
+       : ctx==='simulation'
+       ? 'Your project simulator shows a potential funding need. Choose your purpose or use the account data to get one initial recommendation.'
+       : 'Welcome back, Tiago. Your demo business context is already here: €32,450 available balance, €41,800 in expected receivables and an upcoming €18,000 tax bill.\n\nChoose how you would like to find the best initial financing match.';
+     state.chat.push({role:'assistant',text:intro,actions:starters});
+     if(ctx==='add-details')handleAction('addContext');
+   }
+   renderChat();
+ }
  function renderChat(){const body=q('#chatBody');body.innerHTML='';state.chat.forEach((m,i)=>{if(m.kind==='products'){
   const x=(m.items||[])[0]; if(!x)return;
   const grid=document.createElement('div');grid.className='options-in-chat single';
@@ -267,6 +301,7 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
       <div class="nextstep"><b>Before taking action:</b> ${escapeHtml(x.next)}</div>
       <p class="fineprint">Illustrative recommendation only · No confirmed eligibility, bank policy integration, interest-rate quote or credit approval.</p>
       <button type="button" class="deep-analysis-trigger" aria-expanded="${state.deepExpanded?'true':'false'}" aria-controls="creditDeepAnalysis">${state.deepExpanded?'Hide deeper analysis':'Go deeper in analysis'} <span aria-hidden="true">${state.deepExpanded?'−':'→'}</span></button>
+      <p class="additional-info-link">Is an important detail missing? <button type="button" class="add-facts-link">Add information the bank may not know</button></p>
       <div id="creditDeepAnalysis" class="deep-analysis-panel${state.deepExpanded?'':' hidden'}">
         <div class="deep-analysis-heading">A closer look at your financing decision</div>
         <div class="deep-analysis-grid">
@@ -280,9 +315,13 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
       </div>
     </div>`;
   card.querySelector('.deep-analysis-trigger').addEventListener('click',()=>{state.deepExpanded=!state.deepExpanded;renderChat();});
+  card.querySelector('.add-facts-link').addEventListener('click',()=>handleAction('addContext'));
   grid.append(card);body.append(grid);return;
- }const wrap=document.createElement('div');wrap.className='bubble-wrap '+(m.role==='user'?'user':'assistant');if(m.role==='assistant'){const icon=document.createElement('span');icon.className='agent-icon';icon.style.cssText='width:28px;height:28px;font-size:15px;border-radius:9px';icon.textContent='✦';wrap.append(icon)}const inner=document.createElement('div');inner.className='bubble '+(m.role==='user'?'user':'');inner.textContent=m.text;wrap.append(inner);body.append(wrap);if(m.actions?.length && !state.visibleOptions && !state.awaitingContext){const a=document.createElement('div');a.className='options-in-chat';a.style.cssText='display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;margin-bottom:17px';m.actions.forEach(x=>{const b=document.createElement('button');b.className='chip';b.textContent=x.label;b.type='button';b.addEventListener('click',()=>handleAction(x.id));a.append(b)});body.append(a)}});body.scrollTop=body.scrollHeight;
- const qaBox=q('#quickActions');qaBox.innerHTML='';qaBox.style.display='none'; // The recommendation card contains the only suggested follow-up action.
+ }const wrap=document.createElement('div');wrap.className='bubble-wrap '+(m.role==='user'?'user':'assistant');if(m.role==='assistant'){const icon=document.createElement('span');icon.className='agent-icon';icon.style.cssText='width:28px;height:28px;font-size:15px;border-radius:9px';icon.textContent='✦';wrap.append(icon)}const inner=document.createElement('div');inner.className='bubble '+(m.role==='user'?'user':'');inner.textContent=m.text;wrap.append(inner);body.append(wrap);if(m.actions?.length && !state.visibleOptions && !state.awaitingContext && i===state.chat.length-1){const a=document.createElement('div');a.className='options-in-chat';a.style.cssText='display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;margin-bottom:17px';m.actions.forEach(x=>{const b=document.createElement('button');b.className='chip';b.textContent=x.label;b.type='button';b.addEventListener('click',()=>handleAction(x.id));a.append(b)});body.append(a)}});body.scrollTop=body.scrollHeight;
+ const qaBox=q('#quickActions');qaBox.innerHTML='';qaBox.style.display='none';
+ q('#chatForm').classList.toggle('hidden',!state.awaitingContext);
+ q('#freeTextGuide').classList.toggle('hidden',!state.awaitingContext);
+ if(!state.awaitingContext)q('#contextWarning').classList.add('hidden');
  }
 
 
@@ -362,27 +401,59 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
  function handleAction(id){
    switch(id){
     case'accountSuggest':
-      add('user','Use my existing financial data.');
       state.awaitingContext=false;state.contextNotes={};state.lastAmount=18000;
       showOptions('tax');break;
+    case'guidedNeed':
+      state.awaitingContext=false;state.visibleOptions=false;
+      state.chat=state.chat.filter(m=>m.kind!=='products');
+      add('assistant','What would you like to finance?',[
+        act('A one-off cashflow gap','guidedOneOff'),
+        act('Regular cashflow shortfalls','guidedRepeat'),
+        act('A new project or equipment','guidedProject')
+      ]);break;
+    case'guidedOneOff':
+      add('assistant','When do you expect to need the funds?',[
+        act('Within 7 days','guidedUrgent'),
+        act('Within 30 days','guidedMonth'),
+        act('Not sure yet','guidedUnknown')
+      ]);break;
+    case'guidedUrgent':
+    case'guidedMonth':
+    case'guidedUnknown':{
+      const days=id==='guidedUrgent'?7:id==='guidedMonth'?30:null;
+      state.contextNotes={raw:'One-off financing need selected in the guided flow',amount:null,incoming:false,outgoing:false,project:false,recurring:false,dueDays:days};
+      showOptions('tax');break;
+    }
+    case'guidedRepeat':
+      state.contextNotes={raw:'Recurring cashflow shortfalls selected',amount:null,incoming:false,outgoing:false,project:false,recurring:true,dueDays:null};
+      showOptions('repeat');break;
+    case'guidedProject':
+      add('assistant','What approximate investment size should I use for this example?',[
+        act('Up to €25,000','guidedProjectSmall'),
+        act('€25,000–€50,000','guidedProjectMid'),
+        act('Above €50,000','guidedProjectLarge')
+      ]);break;
+    case'guidedProjectSmall':
+    case'guidedProjectMid':
+    case'guidedProjectLarge':{
+      const amount=id==='guidedProjectSmall'?20000:id==='guidedProjectMid'?40000:70000;
+      state.contextNotes={raw:'Project budget range selected in guided flow',amount,incoming:false,outgoing:false,project:true,recurring:false,dueDays:null};
+      showOptions('project');break;
+    }
     case'addContext':
-      // This is a focus action, not a message generator: clicking twice must not
-      // create a second identical assistant bubble.
+      // The one exception to the guided interface: only credit-relevant facts.
       if(!state.awaitingContext){
         state.awaitingContext=true;
         clearContextPrompt();
-        state.chat.push({
-          role:'assistant',
-          text:'Tell me what the bank may not know yet — an extra payment, expected money coming in, the amount and when it happens. I will update your recommendation using this information.',
-          isContextPrompt:true
-        });
+        state.chat.push({role:'assistant',text:'If the bank is missing an important detail, add the amount, whether it is incoming or outgoing, and when it happens. Choose one of the examples below or enter your own financing-related fact.',isContextPrompt:true});
         renderChat();
       }
-      q('#chatInput').placeholder='Example: I need to pay an extra €20,000 in 7 days';
+      q('#chatInput').placeholder='e.g. I need to pay an extra €20,000 in 7 days';
       q('#chatInput').focus();
       break;
     case'data':
-      add('assistant','The demo uses a fictional current balance of €32,450, example tax payment €18,000, example supplier payment €14,500, and expected invoices. This is NOT a live bank connection.',[act('Show best initial match','accountSuggest'),act('Add new information','addContext')]);break;
+      state.visibleOptions=false;state.awaitingContext=false;
+      add('assistant','This prototype uses €32,450 of fictional balance, an €18,000 tax payment, a €14,500 supplier payment and illustrative future receivables. No live banking data is accessed. The proposed AI would evaluate authorised account data and verified bank credit rules.',[act('Show my best credit','accountSuggest'),act('Choose my financing need','guidedNeed'),act('Add missing information','addContext')]);break;
     case'tax':
       add('user','I need €18,000 to cover taxes while I wait for invoices.');state.lastAmount=18000;showOptions('tax');break;
     case'taxConfirm':showOptions('tax');break;
@@ -401,44 +472,42 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
    }
  }
  function processMessage(text){
-   add('user',text);
-   const lower=text.toLowerCase();
-   if(/\b(why|explain|reason|best match)\b/.test(lower) && !moneyFromText(text)){handleAction('why');return;}
-   if(/\b(cost|rate|interest|price|fee|apr)\b/.test(lower) && !moneyFromText(text)){handleAction('price');return;}
    const n=parseFreeformContext(text);
-   if(n.amount||n.project||n.recurring){
-      state.contextNotes=n;
-      if(n.amount)state.lastAmount=n.amount;
-      // The updated card explains the decision once; avoid an extra confirmation
-      // followed by another repetitive explanation bubble.
-      showOptions(n.project?'project':n.recurring?'repeat':'tax');
-      return;
+   const relevant=/(payment|pay|bill|tax|customer|invoice|receiv|supplier|payroll|cash.?flow|cash coming|financ|credit|loan|business|project|investment|equipment|inventory|revenue|debt|repay|borrow|due|liquidity|money coming|expense)/i.test(text);
+   if(!state.awaitingContext)return;
+   if(!relevant){
+     q('#contextWarning').textContent='This field is for financing-related information only. Please select a relevant example or add a business payment, receipt, project or repayment detail.';
+     q('#contextWarning').classList.remove('hidden');return;
    }
-   if(state.awaitingContext){
-      clearContextPrompt();
-      state.chat.push({
-        role:'assistant',
-        text:'To update the recommendation, please include an approximate amount (for example €20,000), whether the money is incoming or outgoing, and the timing.',
-        isContextPrompt:true
-      });
-      renderChat();
-   }else{
-      add('assistant','I can update your current recommendation if you describe a payment, an incoming invoice or a project. Please tell me the amount and timing.');
+   if(!n.amount){
+     q('#contextWarning').textContent='Please include an approximate euro amount, such as €20,000, so the simulated recommendation can be updated.';
+     q('#contextWarning').classList.remove('hidden');return;
    }
+   q('#contextWarning').classList.add('hidden');
+   state.contextNotes=n;state.lastAmount=n.amount;
+   clearContextPrompt();
+   state.chat.push({role:'user',text});
+   showOptions(n.project?'project':n.recurring?'repeat':'tax');
  }
  // Event handlers must be installed once on page load, not inside processMessage.
  q('#chatForm').addEventListener('submit',function(e){
    e.preventDefault();
    const input=q('#chatInput');const message=input.value.trim();
    if(!message)return;
-   input.value='';processMessage(message);input.focus();
+   processMessage(message);
+   if(!state.awaitingContext)input.value='';
  });
- function saveChat(){try{localStorage.setItem('creditpath-demo-chat-v4',JSON.stringify(state.chat));toast('Demo conversation saved in this browser')}catch(e){toast('Storage unavailable. Use your browser print command to save')}}
- q('#saveChat').onclick=saveChat;q('#resetChat').onclick=()=>{state.chat=[];state.visibleOptions=false;state.deepExpanded=false;state.contextNotes={};state.awaitingContext=false;state.context='sidebar';updateCustomContext();try{localStorage.removeItem('creditpath-demo-chat-v4')}catch(e){};onEnterChat('sidebar');toast('Started a fresh conversation')};
+ function saveChat(){try{localStorage.setItem('creditpath-demo-chat-v5',JSON.stringify(state.chat));toast('Demo conversation saved in this browser')}catch(e){toast('Storage unavailable. Use your browser print command to save')}}
+ q('#saveChat').onclick=saveChat;q('#resetChat').onclick=()=>{state.chat=[];state.visibleOptions=false;state.deepExpanded=false;state.lastChoice=null;state.contextNotes={};state.awaitingContext=false;state.context='sidebar';updateCustomContext();try{localStorage.removeItem('creditpath-demo-chat-v5')}catch(e){};onEnterChat('sidebar');toast('Started a fresh conversation')};
 
+ q('#freeTextGuide').querySelectorAll('[data-fill-example]').forEach(b=>b.addEventListener('click',()=>{
+   q('#chatInput').value=b.dataset.fillExample;
+   q('#contextWarning').classList.add('hidden');
+   q('#chatInput').focus();
+ }));
  q('#modalClose').onclick=q('#modalOk').onclick=()=>q('#modal').classList.add('hidden');q('#modal').onclick=e=>{if(e.target===q('#modal'))q('#modal').classList.add('hidden')};
  try{
-   const saved=JSON.parse(localStorage.getItem('creditpath-demo-chat-v4')||'[]');
+   const saved=JSON.parse(localStorage.getItem('creditpath-demo-chat-v5')||'[]');
    if(Array.isArray(saved)&&saved.length){
       const normalized=[];let contextPromptSeen=false;
       for(const m of saved.slice(-50)){
