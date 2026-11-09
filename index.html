@@ -443,7 +443,7 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
       const normalized=[];let contextPromptSeen=false;
       for(const m of saved.slice(-50)){
          if(!m||typeof m!=='object')continue;
-         if(m.isContextPrompt || (m.role==='assistant' && typeof m.text==='string' && /^Of course\\. Tell me what is missing:/.test(m.text))){
+         if(m.isContextPrompt || (m.role==='assistant' && typeof m.text==='string' && /^Of course\. Tell me what is missing:/.test(m.text))){
             if(contextPromptSeen)continue;
             contextPromptSeen=true;
             normalized.push({role:'assistant',text:'Tell me about any extra payment or incoming cash, the amount, and when it happens. I will update your recommendation.',isContextPrompt:true});
