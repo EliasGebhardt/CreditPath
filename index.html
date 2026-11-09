@@ -240,6 +240,9 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
  q('#scenarioForm').addEventListener('submit',e=>{e.preventDefault();scenario={name:q('#projectName').value.trim()||'New project',cost:Math.max(0,Number(q('#investment').value)||0),receipts:Math.max(0,Number(q('#income').value)||0),delay:Number(q('#incomeDelay').value)};state.scenarioSet=true;renderScenario();toast('Project forecast updated · demo values')});
  const escapeHtml=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function add(role,text,actions){state.chat.push({role,text,actions:actions||null});renderChat()}
+ function clearContextPrompt(){
+   state.chat=state.chat.filter(m=>!m.isContextPrompt && !(m.role==='assistant' && typeof m.text==='string' && /^Of course\. Tell me what is missing:/.test(m.text)));
+ }
  function act(label,id){return {label,id}}
  const starters=[act('Use my existing financial data','accountSuggest'),act('Add more details first','addContext'),act('What data are you using?','data')];
  function onEnterChat(ctx){if(state.chat.length===0){if(ctx==='add-details'){state.awaitingContext=true;add('assistant',"Hi Tiago! I already have your example company information. What else should I consider? Tell me the amount, the timing, the purpose, or anything I cannot see in the account data.",[act('I need €18,000 for taxes','tax'),act('Use my existing data instead','accountSuggest')]);}else{add('assistant',"Welcome back, Tiago. Your demo business context is already here: €32,450 available balance, €41,800 in expected receivables and an upcoming €18,000 tax bill.\n\nYou can get one initial recommendation based on this information, or tell me more to personalise it. Which would you prefer?",starters)}} else if(ctx==='forecast')add('assistant','Your forecast shows a possible €14,800 liquidity gap next month. Would you like to explore ways to cover a short-term gap, or explain the forecast first?',[act('Explore funding options','forecastQuestion'),act('Explain the forecast','forecastExplain')]);else if(ctx==='simulation'){const v=scenarioValues(),gap=Math.max(0,-Math.min(...v));add('assistant',`I see you're considering “${scenario.name}”. The simulated project requires ${fmt(scenario.cost)} upfront and could create a peak funding gap of ${fmt(gap)}. Would you like to understand possible financing paths?`,[act('Explore project financing','scenarioQuestion'),act('Why the gap?','scenarioWhy')])}renderChat()}
@@ -278,8 +281,8 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
     </div>`;
   card.querySelector('.deep-analysis-trigger').addEventListener('click',()=>{state.deepExpanded=!state.deepExpanded;renderChat();});
   grid.append(card);body.append(grid);return;
- }const wrap=document.createElement('div');wrap.className='bubble-wrap '+(m.role==='user'?'user':'assistant');if(m.role==='assistant'){const icon=document.createElement('span');icon.className='agent-icon';icon.style.cssText='width:28px;height:28px;font-size:15px;border-radius:9px';icon.textContent='✦';wrap.append(icon)}const inner=document.createElement('div');inner.className='bubble '+(m.role==='user'?'user':'');inner.textContent=m.text;wrap.append(inner);body.append(wrap);if(m.actions?.length && !state.visibleOptions){const a=document.createElement('div');a.className='options-in-chat';a.style.cssText='display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;margin-bottom:17px';m.actions.forEach(x=>{const b=document.createElement('button');b.className='chip';b.textContent=x.label;b.type='button';b.addEventListener('click',()=>handleAction(x.id));a.append(b)});body.append(a)}});body.scrollTop=body.scrollHeight;
- const qaBox=q('#quickActions');qaBox.innerHTML=''; // The card contains the single follow-up action.
+ }const wrap=document.createElement('div');wrap.className='bubble-wrap '+(m.role==='user'?'user':'assistant');if(m.role==='assistant'){const icon=document.createElement('span');icon.className='agent-icon';icon.style.cssText='width:28px;height:28px;font-size:15px;border-radius:9px';icon.textContent='✦';wrap.append(icon)}const inner=document.createElement('div');inner.className='bubble '+(m.role==='user'?'user':'');inner.textContent=m.text;wrap.append(inner);body.append(wrap);if(m.actions?.length && !state.visibleOptions && !state.awaitingContext){const a=document.createElement('div');a.className='options-in-chat';a.style.cssText='display:flex;flex-wrap:wrap;gap:7px;margin-top:5px;margin-bottom:17px';m.actions.forEach(x=>{const b=document.createElement('button');b.className='chip';b.textContent=x.label;b.type='button';b.addEventListener('click',()=>handleAction(x.id));a.append(b)});body.append(a)}});body.scrollTop=body.scrollHeight;
+ const qaBox=q('#quickActions');qaBox.innerHTML='';qaBox.style.display='none'; // The recommendation card contains the only suggested follow-up action.
  }
 
 
@@ -347,6 +350,7 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
    const n=state.contextNotes||{};
    if(kind==='project')n.project=true;
    if(kind==='repeat')n.recurring=true;
+   clearContextPrompt();state.awaitingContext=false;
    const choice=bestRoute();state.lastChoice=choice;updateCustomContext();
    // Replace the old recommendation instead of echoing its reasoning in chat.
    state.deepExpanded=false;
@@ -362,9 +366,21 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
       state.awaitingContext=false;state.contextNotes={};state.lastAmount=18000;
       showOptions('tax');break;
     case'addContext':
-      state.awaitingContext=true;
-      add('assistant','Of course. Tell me what is missing: an additional payment, cash coming in, the amount, or when it will happen. I will recalculate the example and update the recommendation.');
-      q('#chatInput').placeholder='Example: I need to pay an extra €20,000 in 7 days';q('#chatInput').focus();break;
+      // This is a focus action, not a message generator: clicking twice must not
+      // create a second identical assistant bubble.
+      if(!state.awaitingContext){
+        state.awaitingContext=true;
+        clearContextPrompt();
+        state.chat.push({
+          role:'assistant',
+          text:'Tell me what the bank may not know yet — an extra payment, expected money coming in, the amount and when it happens. I will update your recommendation using this information.',
+          isContextPrompt:true
+        });
+        renderChat();
+      }
+      q('#chatInput').placeholder='Example: I need to pay an extra €20,000 in 7 days';
+      q('#chatInput').focus();
+      break;
     case'data':
       add('assistant','The demo uses a fictional current balance of €32,450, example tax payment €18,000, example supplier payment €14,500, and expected invoices. This is NOT a live bank connection.',[act('Show best initial match','accountSuggest'),act('Add new information','addContext')]);break;
     case'tax':
@@ -391,17 +407,23 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
    if(/\b(cost|rate|interest|price|fee|apr)\b/.test(lower) && !moneyFromText(text)){handleAction('price');return;}
    const n=parseFreeformContext(text);
    if(n.amount||n.project||n.recurring){
-      state.awaitingContext=false;
       state.contextNotes=n;
       if(n.amount)state.lastAmount=n.amount;
-      add('assistant',`Thanks, Tiago. I’ve noted ${describeContext(n)}. I’ll use this new information in the updated example. ${n.outgoing&&n.amount?'The additional outgoing payment has been added to the simulated cashflow.':''}`);
+      // The updated card explains the decision once; avoid an extra confirmation
+      // followed by another repetitive explanation bubble.
       showOptions(n.project?'project':n.recurring?'repeat':'tax');
       return;
    }
    if(state.awaitingContext){
-      add('assistant','Got it. To refresh the simulated cashflow and recommendation, could you add an approximate € amount, whether it is incoming or outgoing, and the timing?',[act('Show my current match','accountSuggest')]);
+      clearContextPrompt();
+      state.chat.push({
+        role:'assistant',
+        text:'To update the recommendation, please include an approximate amount (for example €20,000), whether the money is incoming or outgoing, and the timing.',
+        isContextPrompt:true
+      });
+      renderChat();
    }else{
-      add('assistant','I can explain your recommended option or update it if you describe a new payment, an incoming invoice, or a project. What would you like to explore?',[act('Why this is my match','why'),act('Add details','addContext')]);
+      add('assistant','I can update your current recommendation if you describe a payment, an incoming invoice or a project. Please tell me the amount and timing.');
    }
  }
  // Event handlers must be installed once on page load, not inside processMessage.
@@ -415,7 +437,24 @@ body:has(section[data-view]:target) section[data-view]:target.hidden{display:blo
  q('#saveChat').onclick=saveChat;q('#resetChat').onclick=()=>{state.chat=[];state.visibleOptions=false;state.deepExpanded=false;state.contextNotes={};state.awaitingContext=false;state.context='sidebar';updateCustomContext();try{localStorage.removeItem('creditpath-demo-chat-v4')}catch(e){};onEnterChat('sidebar');toast('Started a fresh conversation')};
 
  q('#modalClose').onclick=q('#modalOk').onclick=()=>q('#modal').classList.add('hidden');q('#modal').onclick=e=>{if(e.target===q('#modal'))q('#modal').classList.add('hidden')};
- try{const saved=JSON.parse(localStorage.getItem('creditpath-demo-chat-v4')||'[]');if(Array.isArray(saved)&&saved.length){state.chat=saved.slice(-50);const latest=[...state.chat].reverse().find(m=>m.kind==='products');if(latest){state.lastChoice=latest.items?.[0]||null;state.visibleOptions=!!state.lastChoice;}}}catch(e){}
+ try{
+   const saved=JSON.parse(localStorage.getItem('creditpath-demo-chat-v4')||'[]');
+   if(Array.isArray(saved)&&saved.length){
+      const normalized=[];let contextPromptSeen=false;
+      for(const m of saved.slice(-50)){
+         if(!m||typeof m!=='object')continue;
+         if(m.isContextPrompt || (m.role==='assistant' && typeof m.text==='string' && /^Of course\\. Tell me what is missing:/.test(m.text))){
+            if(contextPromptSeen)continue;
+            contextPromptSeen=true;
+            normalized.push({role:'assistant',text:'Tell me about any extra payment or incoming cash, the amount, and when it happens. I will update your recommendation.',isContextPrompt:true});
+         }else normalized.push(m);
+      }
+      state.chat=normalized;
+      const latest=[...state.chat].reverse().find(m=>m.kind==='products');
+      if(latest){state.lastChoice=latest.items?.[0]||null;state.visibleOptions=!!state.lastChoice;}
+      state.awaitingContext=Boolean(state.chat.length && state.chat[state.chat.length-1].isContextPrompt);
+   }
+ }catch(e){}
  renderForecast();renderScenario();show('overview');window.addEventListener('resize',()=>{if(page==='overview')renderHomeAgenda()});
 })();
 </script>
